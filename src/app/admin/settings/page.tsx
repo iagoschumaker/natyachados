@@ -13,6 +13,7 @@
 
 import { useState, useEffect, useCallback } from "react";
 import Image from "next/image";
+import ImageCropper from "@/components/ImageCropper";
 
 interface Settings {
   siteTitle: string;
@@ -31,6 +32,7 @@ export default function SettingsPage() {
   const [saving, setSaving] = useState(false);
   const [saved, setSaved] = useState(false);
   const [uploading, setUploading] = useState(false);
+  const [cropFile, setCropFile] = useState<File | null>(null);
 
   const fetchSettings = useCallback(async () => {
     try {
@@ -71,9 +73,42 @@ export default function SettingsPage() {
     }
   };
 
+  const handleLogoSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    setCropFile(file);
+    // Reset input para permitir selecionar o mesmo arquivo novamente
+    e.target.value = "";
+  };
+
+  const handleCroppedUpload = async (blob: Blob) => {
+    if (!settings) return;
+    setCropFile(null);
+    setUploading(true);
+
+    const formData = new FormData();
+    formData.append("file", new File([blob], "logo.png", { type: "image/png" }));
+
+    try {
+      const res = await fetch("/api/admin/upload", {
+        method: "POST",
+        body: formData,
+      });
+
+      if (res.ok) {
+        const { url } = await res.json();
+        setSettings({ ...settings, logoUrl: url });
+      }
+    } catch (err) {
+      console.error("Erro no upload:", err);
+    } finally {
+      setUploading(false);
+    }
+  };
+
   const handleUpload = async (
     e: React.ChangeEvent<HTMLInputElement>,
-    field: "logoUrl" | "faviconUrl"
+    field: "faviconUrl"
   ) => {
     const file = e.target.files?.[0];
     if (!file || !settings) return;
@@ -192,7 +227,7 @@ export default function SettingsPage() {
                   type="file"
                   accept="image/*"
                   className="hidden"
-                  onChange={(e) => handleUpload(e, "logoUrl")}
+                  onChange={handleLogoSelect}
                   disabled={uploading}
                 />
               </label>
@@ -354,6 +389,15 @@ export default function SettingsPage() {
           )}
         </div>
       </form>
+
+      {/* Image Cropper Modal */}
+      {cropFile && (
+        <ImageCropper
+          file={cropFile}
+          onCrop={handleCroppedUpload}
+          onCancel={() => setCropFile(null)}
+        />
+      )}
     </div>
   );
 }
