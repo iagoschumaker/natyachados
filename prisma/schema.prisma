@@ -1,0 +1,52 @@
+// ==========================================================
+// SCHEMA DO BANCO DE DADOS - Naty Achados
+// ==========================================================
+// Para alterar a estrutura do banco, edite este arquivo e rode:
+//   npx prisma migrate dev --name descricao_da_mudanca
+// ==========================================================
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+// Tabela de administradores
+model User {
+  id           Int      @id @default(autoincrement())
+  username     String   @unique
+  passwordHash String
+  createdAt    DateTime @default(now())
+}
+
+// Tabela de links
+model Link {
+  id         Int      @id @default(autoincrement())
+  title      String
+  url        String
+  icon       String?  // Emoji ou nome de ícone (opcional)
+  order      Int      @default(0)
+  isActive   Boolean  @default(true)
+  isFeatured Boolean  @default(false)
+  notes      String?  // Observação interna (só aparece no admin)
+  clicks     Int      @default(0)
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+}
+
+// Configurações gerais da página
+model SiteSettings {
+  id              Int      @id @default(1)
+  siteTitle       String   @default("Naty Achados")
+  siteSubtitle    String   @default("Achados que valem a pena ✨")
+  logoUrl         String?
+  footerText      String   @default("© Naty Achados")
+  primaryColor    String   @default("#8B5CF6") // Roxo vibrante
+  backgroundColor String   @default("#F8F7FF") // Lavanda claro
+  faviconUrl      String?
+  headScripts     String?  // Scripts extras (Google Analytics, Pixel, etc)
+  updatedAt       DateTime @updatedAt
+}
