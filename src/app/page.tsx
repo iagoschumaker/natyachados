@@ -7,7 +7,7 @@
 
 import { prisma } from "@/lib/prisma";
 import LinkButton from "@/components/LinkButton";
-import Image from "next/image";
+// Using native <img> for dynamic uploads (logo)
 import type { Metadata } from "next";
 
 // SEO: Gera metadata dinâmica a partir das configurações
@@ -91,13 +91,10 @@ export default async function PublicPage() {
               <div className="relative mx-auto mb-5">
                 {logoUrl ? (
                   <div className="w-24 h-24 sm:w-28 sm:h-28 rounded-full overflow-hidden mx-auto ring-4 ring-white shadow-xl">
-                    <Image
+                    <img
                       src={logoUrl}
                       alt={title}
-                      width={112}
-                      height={112}
                       className="object-cover w-full h-full"
-                      priority
                     />
                   </div>
                 ) : (

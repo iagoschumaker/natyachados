@@ -12,7 +12,6 @@
 "use client";
 
 import { useState, useEffect, useCallback } from "react";
-import Image from "next/image";
 import ImageCropper from "@/components/ImageCropper";
 
 interface Settings {
@@ -208,11 +207,10 @@ export default function SettingsPage() {
           <div className="flex items-center gap-4">
             {settings.logoUrl ? (
               <div className="relative w-20 h-20 rounded-2xl overflow-hidden border-2 border-gray-100 shadow-sm">
-                <Image
+                <img
                   src={settings.logoUrl}
                   alt="Logo"
-                  fill
-                  className="object-cover"
+                  className="w-full h-full object-cover"
                 />
               </div>
             ) : (
@@ -325,11 +323,10 @@ export default function SettingsPage() {
           <div className="flex items-center gap-4">
             {settings.faviconUrl ? (
               <div className="relative w-10 h-10 rounded-lg overflow-hidden border border-gray-200">
-                <Image
+                <img
                   src={settings.faviconUrl}
                   alt="Favicon"
-                  fill
-                  className="object-contain"
+                  className="w-full h-full object-contain"
                 />
               </div>
             ) : (
