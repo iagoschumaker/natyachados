@@ -40,6 +40,7 @@ export default function AdminDashboard() {
   const [formIsActive, setFormIsActive] = useState(true);
   const [formIsFeatured, setFormIsFeatured] = useState(false);
   const [fetchingImage, setFetchingImage] = useState(false);
+  const [uploadingImage, setUploadingImage] = useState(false);
   const [imageError, setImageError] = useState("");
 
   // Selection + WhatsApp state
@@ -114,13 +115,47 @@ export default function AdminDashboard() {
         if (!formTitle && data.title) {
           setFormTitle(data.title);
         }
+        setImageError("");
       } else {
-        setImageError("Nenhuma imagem encontrada neste link");
+        setImageError("Nenhuma imagem encontrada — envie uma manualmente");
       }
     } catch {
-      setImageError("Erro ao buscar imagem do link");
+      setImageError("Erro ao buscar imagem — envie uma manualmente");
     } finally {
       setFetchingImage(false);
+    }
+  };
+
+  // ========== UPLOAD MANUAL DE IMAGEM ==========
+  const handleUploadImage = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    setUploadingImage(true);
+    setImageError("");
+
+    try {
+      const formData = new FormData();
+      formData.append("file", file);
+
+      const res = await fetch("/api/admin/upload", {
+        method: "POST",
+        body: formData,
+      });
+
+      const data = await res.json();
+
+      if (res.ok && data.url) {
+        setFormImageUrl(data.url);
+      } else {
+        setImageError(data.error || "Erro ao fazer upload");
+      }
+    } catch {
+      setImageError("Erro ao fazer upload da imagem");
+    } finally {
+      setUploadingImage(false);
+      // Reset file input
+      e.target.value = "";
     }
   };
 
@@ -414,8 +449,8 @@ export default function AdminDashboard() {
                   )}
                 </div>
 
-                {/* Image preview */}
-                {formImageUrl && (
+                {/* Image preview OR upload area */}
+                {formImageUrl ? (
                   <div className="relative bg-gray-50 rounded-xl border border-gray-200 p-3">
                     <div className="flex items-center gap-3">
                       <div className="w-16 h-16 rounded-lg overflow-hidden bg-white border border-gray-100 shadow-sm shrink-0">
@@ -444,6 +479,38 @@ export default function AdminDashboard() {
                         </svg>
                       </button>
                     </div>
+                  </div>
+                ) : (
+                  <div className="relative">
+                    <label
+                      className={`flex items-center justify-center gap-2 px-4 py-3 rounded-xl border-2 border-dashed transition-all cursor-pointer ${
+                        uploadingImage
+                          ? "border-violet-300 bg-violet-50"
+                          : "border-gray-200 hover:border-violet-400 hover:bg-violet-50/50"
+                      }`}
+                    >
+                      <input
+                        type="file"
+                        accept="image/jpeg,image/png,image/webp,image/gif"
+                        onChange={handleUploadImage}
+                        className="hidden"
+                        disabled={uploadingImage}
+                      />
+                      {uploadingImage ? (
+                        <>
+                          <div className="animate-spin rounded-full h-4 w-4 border-2 border-violet-500 border-t-transparent" />
+                          <span className="text-sm text-violet-600 font-medium">Enviando...</span>
+                        </>
+                      ) : (
+                        <>
+                          <svg className="w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                          </svg>
+                          <span className="text-sm text-gray-500">Enviar imagem do produto</span>
+                          <span className="text-xs text-gray-300">(JPG, PNG, WebP)</span>
+                        </>
+                      )}
+                    </label>
                   </div>
                 )}
 
