@@ -44,6 +44,7 @@ export async function POST(req: NextRequest) {
       data: {
         title: data.title,
         url: data.url,
+        imageUrl: data.imageUrl || null,
         icon: data.icon || null,
         order: data.order ?? nextOrder,
         isActive: data.isActive ?? true,

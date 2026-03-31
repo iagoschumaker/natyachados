@@ -1,6 +1,8 @@
 // ==========================================================
 // COMPONENTE: LinkButton (clicável, com tracking de cliques)
 // ==========================================================
+// Agora com suporte a thumbnail de imagem do produto
+// ==========================================================
 "use client";
 
 interface LinkButtonProps {
@@ -8,6 +10,7 @@ interface LinkButtonProps {
   title: string;
   url: string;
   icon: string | null;
+  imageUrl: string | null;
   isFeatured: boolean;
   primaryColor: string;
 }
@@ -17,6 +20,7 @@ export default function LinkButton({
   title,
   url,
   icon,
+  imageUrl,
   isFeatured,
   primaryColor,
 }: LinkButtonProps) {
@@ -31,10 +35,10 @@ export default function LinkButton({
       target="_blank"
       rel="noopener noreferrer"
       onClick={handleClick}
-      className={`group block w-full text-center relative overflow-hidden transition-all duration-300 ${
+      className={`group block w-full relative overflow-hidden transition-all duration-300 ${
         isFeatured
-          ? "py-4 px-6 rounded-2xl text-white font-bold text-lg shadow-xl hover:shadow-2xl hover:scale-[1.03] active:scale-[0.98]"
-          : "py-3.5 px-6 rounded-xl text-white font-semibold shadow-md hover:shadow-lg hover:scale-[1.02] active:scale-[0.98]"
+          ? "py-4 px-5 rounded-2xl text-white font-bold shadow-xl hover:shadow-2xl hover:scale-[1.03] active:scale-[0.98]"
+          : "py-3.5 px-5 rounded-xl text-white font-semibold shadow-md hover:shadow-lg hover:scale-[1.02] active:scale-[0.98]"
       }`}
       style={{
         backgroundColor: primaryColor,
@@ -51,9 +55,26 @@ export default function LinkButton({
         />
       )}
 
-      <span className="relative flex items-center justify-center gap-2">
-        {icon && <span className="text-xl">{icon}</span>}
-        {title}
+      <span className="relative flex items-center gap-3">
+        {/* Product image thumbnail */}
+        {imageUrl && (
+          <span className="w-10 h-10 rounded-lg overflow-hidden bg-white/20 shrink-0 shadow-sm border border-white/20">
+            <img
+              src={imageUrl}
+              alt=""
+              className="w-full h-full object-cover"
+              loading="lazy"
+              onError={(e) => {
+                (e.target as HTMLImageElement).parentElement!.style.display = "none";
+              }}
+            />
+          </span>
+        )}
+        {/* Icon + Title */}
+        <span className={`flex items-center gap-2 ${imageUrl ? "" : "justify-center w-full"} ${isFeatured ? "text-lg" : ""}`}>
+          {icon && <span className="text-xl">{icon}</span>}
+          <span className="truncate">{title}</span>
+        </span>
       </span>
     </a>
   );

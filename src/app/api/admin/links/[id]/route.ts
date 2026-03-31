@@ -27,6 +27,7 @@ export async function PUT(
       data: {
         title: data.title,
         url: data.url,
+        imageUrl: data.imageUrl,
         icon: data.icon,
         order: data.order,
         isActive: data.isActive,

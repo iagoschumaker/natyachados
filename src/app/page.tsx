@@ -137,6 +137,7 @@ export default async function PublicPage() {
                     title={link.title}
                     url={link.url}
                     icon={link.icon}
+                    imageUrl={link.imageUrl}
                     isFeatured={link.isFeatured}
                     primaryColor={primaryColor}
                   />
